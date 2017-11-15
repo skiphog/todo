@@ -1,0 +1,5 @@
+User-Agent: *
+Disallow:
+
+Crawl-delay: 10
+Host: https://skiphog.ru
