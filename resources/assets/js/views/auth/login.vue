@@ -32,7 +32,7 @@
     data () {
       return {
         form: {
-          login: 'Rosetta',
+          login: 'demo',
           password: '123456'
         },
         error: {},

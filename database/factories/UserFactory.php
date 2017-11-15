@@ -9,7 +9,7 @@ $factory->define(User::class, function (Faker $faker) {
     static $password;
 
     return [
-        'login'     => $faker->unique()->name,
+        'login'     => 'demo',
         'password'  => $password ?: $password = bcrypt('123456'),
         'api_token' => str_random(60),
     ];
