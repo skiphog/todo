@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DashRequest;
 use App\Note;
 use App\Panel;
 use Illuminate\Http\Request;
+use App\Http\Requests\DashRequest;
 
 class DashboardController extends Controller
 {
@@ -16,8 +16,6 @@ class DashboardController extends Controller
 
     public function index()
     {
-
-
         $panels = Panel::with('notes')
             ->where('user_id', \Auth::id())
             ->orderBy('created_at', 'desc')
@@ -105,6 +103,22 @@ class DashboardController extends Controller
                 'saved'   => true,
                 'id'      => $panel->id,
                 'message' => 'Список создан'
+            ]);
+    }
+
+    public function destroy($id, Request $request)
+    {
+        $panel = $request->user()->panels()
+            ->findOrFail($id);
+
+        Note::where('panel_id', $panel->id)
+            ->delete();
+
+        $panel->delete();
+
+        return response()
+            ->json([
+                'deleted' => true
             ]);
     }
 }

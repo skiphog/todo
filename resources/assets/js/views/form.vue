@@ -28,6 +28,9 @@
             </button>
 
             <button class="btn" @click="$router.back()" :disabled="isProcessing">Назад</button>
+
+            <button v-if="this.$route.meta.mode === 'edit'" class="btn btn__danger" @click="removePanel" :disabled="isProcessing">Удалить</button>
+
         </div>
 
     </div>
@@ -36,7 +39,7 @@
 <script>
   import Vue from 'vue';
   import Flash from '../helpers/flash';
-  import { get, post } from '../helpers/api';
+  import { get, post, del } from '../helpers/api';
 
   export default {
     data () {
@@ -67,16 +70,16 @@
         const form = JSON.parse(JSON.stringify(this.form));
 
         post(this.storeUrl, form).then((res) => {
-          if(res.data.saved) {
+          if (res.data.saved) {
             Flash.setSuccess(res.data.message);
             this.$router.push(`/dashboard`);
           }
-          this.isProcessing = false
+          this.isProcessing = false;
         }).catch((err) => {
-          if(err.response.status === 422) {
-            this.error = err.response.data.errors
+          if (err.response.status === 422) {
+            this.error = err.response.data.errors;
           }
-          this.isProcessing = false
+          this.isProcessing = false;
         });
       },
       addNote () {
@@ -85,6 +88,14 @@
       remove (i) {
         console.log(this.form);
         this.form.notes.splice(i, 1);
+      },
+      removePanel () {
+        del(`/api/dashboard/${this.$route.params.id}`).then((res) => {
+          if (res.data.deleted) {
+            Flash.setSuccess('Удалено');
+            this.$router.push('/dashboard');
+          }
+        });
       }
     }
 

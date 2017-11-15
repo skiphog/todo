@@ -15,11 +15,11 @@
                 </li>
 
                 <li class="navbar__item" v-if="check">
-                    <router-link to="/dashboard/create">Создать</router-link>
+                    <router-link to="/dashboard">Мои списки</router-link>
                 </li>
 
                 <li class="navbar__item" v-if="check">
-                    <router-link to="/dashboard">Мои списки</router-link>
+                    <router-link to="/dashboard/create">Создать</router-link>
                 </li>
 
                 <li class="navbar__item" v-if="check">
