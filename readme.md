@@ -80,3 +80,6 @@ npm install
 npm run watch
 ```
 
+- [Контроллеры](https://github.com/skiphog/todo/tree/master/app/Http/Controllers)
+- [Модели](https://github.com/skiphog/todo/tree/master/app)
+- [Шаблоны (Vue) и js](https://github.com/skiphog/todo/tree/master/resources/assets/js)
