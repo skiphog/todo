@@ -68,7 +68,7 @@ php artisan migrate
 ```
 php artisan db:seed
 ```
-Для входа использовать login - demo, password - 
+Для входа использовать login - **demo**, password - **demo**
 
 **Profit**
 
