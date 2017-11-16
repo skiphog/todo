@@ -46,8 +46,8 @@ class DashboardController extends Controller
                 'count'      => $count,
                 'complete'   => $complete,
                 'incomplete' => $count - $complete,
-                'date_end'   => $date->reverse()->first()->format('d-m-Y H:s'),
                 'date_start' => $date->first()->format('d-m-Y H:s'),
+                'date_end'   => $date->reverse()->first()->format('d-m-Y H:s'),
             ]
         ]);
     }
