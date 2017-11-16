@@ -17,6 +17,7 @@ class CreatePanelsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->string('title');
+            $table->boolean('checked')->default(false);
             $table->timestamps();
         });
     }

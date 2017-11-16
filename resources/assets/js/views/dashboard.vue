@@ -32,7 +32,7 @@
         <div class="columns">
             <div class="column panel" v-for="(item, j) in lists">
                 <p class="panel-heading">
-                    {{ item.title }}
+                    <span :class="{'checked' : item.checked}">{{ item.title }}</span>
                     <router-link class="icon-burger" :to="`/dashboard/${item.id}/edit`"></router-link>
                 </p>
 
@@ -40,7 +40,7 @@
 
                     <div class="level">
                         <div class="level-left">
-                            <span class="level__checked" :class="{'checked' : note.checked}" @click="changeChecked(note)">{{ note.content }}</span>
+                            <span class="level__checked" :class="{'checked' : note.checked}" @click="changeChecked(note,item)">{{ note.content }}</span>
                         </div>
                         <div class="level-right">
                             <button class="delete" @click="deleteNote(j, i)"></button>
@@ -48,6 +48,21 @@
                     </div>
 
                 </div>
+            </div>
+        </div>
+
+
+        <div class="info">
+            <div>
+                Всего списков {{ info.count}}
+                <br>
+                Выполненные списки {{info.complete}}
+                <br>
+                Невыполненные списки {{info.incomplete }}
+                <br>
+                Дата первого списка: {{info.date_start}}
+                <br>
+                Дата последнего: {{info.date_end}}
             </div>
         </div>
 
@@ -62,6 +77,13 @@
     data () {
       return {
         lists: [],
+        info: {
+          complete: 0,
+          incomplete: 0,
+          count: 0,
+          date_end: null,
+          date_start: null
+        },
         total: 0,
         perPage: 5,
         currentPage: 1,
@@ -97,6 +119,7 @@
     },
     created () {
       this.fetchLists(this.currentPage);
+
     },
     methods: {
       hasFirst () {
@@ -119,6 +142,7 @@
           this.lists = data.data;
           this.total = parseInt(data.last_page);
           this.currentPage = page;
+          this.info = res.data.info;
 
         }).catch(/* todo Error */);
 
@@ -126,11 +150,12 @@
       changePage: function (page) {
         this.fetchLists(page);
       },
-      changeChecked (note) {
+      changeChecked (note, panel) {
         note.checked = !note.checked;
         post(`/api/note/${note.id}?_method=PUT`, {checked: note.checked}).then((res) => {
           //todo: что-то сдедать
         });
+        this.reCheck(panel);
       },
       deleteNote (panelIndex, noteIndex) {
         let id = this.lists[panelIndex].notes[noteIndex].id;
@@ -138,6 +163,22 @@
         del(`/api/note/${id}`).then((res) => {
           // todo:: что-то сделать
         });
+        this.reCheck(this.lists[panelIndex]);
+      },
+      reCheck (panel) {
+        let res = !(panel.notes.filter((i) => {
+          return !i.checked;
+        }).length);
+
+        if (!panel.checked && res) {
+          panel.checked = res;
+          this.info.complete++;
+          this.info.incomplete--;
+        } else if (panel.checked && !res) {
+          this.info.complete--;
+          this.info.incomplete++;
+          panel.checked = res;
+        }
       }
     }
   };

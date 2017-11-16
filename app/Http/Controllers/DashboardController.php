@@ -6,6 +6,7 @@ use App\Note;
 use App\Panel;
 use Illuminate\Http\Request;
 use App\Http\Requests\DashRequest;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
@@ -14,18 +15,48 @@ class DashboardController extends Controller
         $this->middleware('auth:api');
     }
 
-    public function index()
+    /**
+     * Вернуть все списки
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Request $request)
     {
-        $panels = Panel::with('notes')
-            ->where('user_id', \Auth::id())
+        $panels = $request->user()
+            ->panels()
+            ->with('notes')
             ->orderBy('created_at', 'desc')
             ->paginate(5);
 
+
+        /** @var Collection $panel */
+        $panel = $request->user()->panels()->get();
+
+        $count = $panel->count();
+        $complete = $panel->where('checked', true)->count();
+
+
+        $date = $panel->pluck('created_at');
+
         return response()->json([
-            'panel' => $panels
+            'panel' => $panels,
+            'info'  => [
+                'count'      => $count,
+                'complete'   => $complete,
+                'incomplete' => $count - $complete,
+                'date_end'   => $date->reverse()->first()->format('d-m-Y H:s'),
+                'date_start' => $date->first()->format('d-m-Y H:s'),
+            ]
         ]);
     }
 
+    /**
+     * Форма для создания списка
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function create()
     {
         return response()->json([
@@ -33,6 +64,14 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Форма для редактирования списка
+     *
+     * @param         $id
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function edit($id, Request $request)
     {
         $form = $request->user()
@@ -45,6 +84,14 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Обновить список + заметки
+     *
+     * @param             $id
+     * @param DashRequest $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update($id, DashRequest $request)
     {
         $panel = $request->user()->panels()->findOrFail($id);
@@ -64,25 +111,35 @@ class DashboardController extends Controller
             }
         }
 
-        $panel->title = $request->title;
-        $panel->save();
+        tap($panel, function ($panel) use ($request) {
+            $panel->title = $request->title;
+        })->save();
+
 
         Note::whereNotIn('id', $notesUpdate)
             ->where('panel_id', $panel->id)
             ->delete();
 
-        if (count($notes)) {
+        if (\count($notes)) {
             $panel->notes()->saveMany($notes);
         }
 
-        return response()
-            ->json([
-                'saved'   => true,
-                'id'      => $panel->id,
-                'message' => 'Обновлено'
-            ]);
+        $panel->reCheck();
+
+        return response()->json([
+            'saved'   => true,
+            'id'      => $panel->id,
+            'message' => 'Обновлено'
+        ]);
     }
 
+    /**
+     * Добавить спискок + заметки
+     *
+     * @param DashRequest $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(DashRequest $request)
     {
         $notes = [];
@@ -93,32 +150,37 @@ class DashboardController extends Controller
 
         $panel = new Panel($request->only('title'));
 
-        $request->user()->panels()
-            ->save($panel);
+        $request->user()->panels()->save($panel);
 
-        $panel->notes()
-            ->saveMany($notes);
-        return response()
-            ->json([
-                'saved'   => true,
-                'id'      => $panel->id,
-                'message' => 'Список создан'
-            ]);
+        $panel->notes()->saveMany($notes);
+
+        return response()->json([
+            'saved'   => true,
+            'id'      => $panel->id,
+            'message' => 'Список создан'
+        ]);
     }
 
+    /**
+     * Удалить список
+     *
+     * @param         $id
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function destroy($id, Request $request)
     {
         $panel = $request->user()->panels()
             ->findOrFail($id);
 
-        Note::where('panel_id', $panel->id)
-            ->delete();
+        tap($panel, function ($panel) {
+            Note::where('panel_id', $panel->id)->delete();
+        })->delete();
 
-        $panel->delete();
-
-        return response()
-            ->json([
-                'deleted' => true
-            ]);
+        return response()->json([
+            'deleted' => true
+        ]);
     }
 }

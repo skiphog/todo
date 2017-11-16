@@ -14,17 +14,31 @@ class AuthController extends Controller
         $this->middleware('auth:api')->only('logout');
     }
 
+    /**
+     * Регистрация пользователся
+     *
+     * @param RegisterRequest $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function register(RegisterRequest $request)
     {
-        $user = new User($request->all());
-        $user->password = bcrypt($request->password);
-        $user->save();
+        tap(new User($request->all()), function ($user) use ($request) {
+            $user->password = bcrypt($request->password);
+        })->save();
 
         return response()->json([
             'registered' => true
         ]);
     }
 
+    /**
+     * Аутентификация
+     *
+     * @param LoginRequest $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function login(LoginRequest $request)
     {
         $user = User::where('login', $request->login)->first();
@@ -45,12 +59,18 @@ class AuthController extends Controller
         ], 422);
     }
 
+    /**
+     * Выход
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
-        // use tap
-        $user = $request->user();
-        $user->api_token = null;
-        $user->save();
+        tap($request->user(), function ($user) {
+            $user->api_token = null;
+        })->save();
 
         return response()->json([
             'logged_out' => true
