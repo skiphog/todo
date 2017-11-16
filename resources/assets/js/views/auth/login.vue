@@ -35,7 +35,7 @@
       return {
         form: {
           login: 'demo',
-          password: '123456'
+          password: 'demo'
         },
         error: {},
         isProcessing: false
