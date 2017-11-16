@@ -1,54 +1,42 @@
-@import "~bulma";
+//$global-link-color: #da4c59;
+
+$global-primary-background: #005ca1 !default;
+$global-secondary-background: #24b662 !default;
+$global-danger-background: #c9302c !default;
+
+@import "~uikit/src/scss/variables-theme.scss";
+@import "~uikit/src/scss/mixins-theme.scss";
+
+@import "~uikit/src/scss/uikit-theme.scss";
 
 * {
   box-sizing: border-box;
 }
 
 html {
-  background: rgb(235, 238, 243);
+  overflow-y: scroll;
+  background: #f0f0f0;
 }
 
-body {
-  margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #616161;
+.list-close {
+  float: right;
 }
 
-a {
-  text-decoration: none;
-  color: #616161;
+.checked-box {
+  cursor: pointer;
 }
 
-.container {
-  margin-bottom: 50px;
-}
-
-.navbar {
-  background: #fff;
-  padding: 15px 25px;
-  box-shadow: rgba(0, 0, 0, 0.09) 0 2px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  &__brand a {
-    color: #2124e9;
-    font-weight: bold;
-  }
-  &__list {
-    margin: 0;
-    padding: 0;
-  }
-  &__item {
-    display: inline;
-    margin-left: 25px;
+.checked {
+  color: rgba(0, 128, 0, 0.63) !important;
+  &:before {
+    content: '✔ ';
   }
 }
 
 .form {
   background: #fff;
   box-shadow: rgba(0, 0, 0, 0.09) 0 2px 0;
-  width: 30%;
+  width: 40%;
   margin: 30px auto;
   padding: 15px;
   &__group {
@@ -79,6 +67,9 @@ a {
   }
   &__edit {
     margin: 15px 0;
+  }
+  &__title {
+    font-size: 2em;
   }
 }
 
@@ -124,42 +115,16 @@ a {
   }
 }
 
-.flash {
-  width: 50%;
-  margin: 15px auto 0;
-  padding: 15px;
-  border-radius: 2px;
-  &__success {
-    background: #a5d6a7;
-    border: 1px solid #81c784;
-    color: #1b5e20;
-  }
-  &__error {
-    background: #ef9a9a;
-    border: 1px solid #e57373;
-    color: #b71c1c;
-  }
+.delete {
+  position: absolute;
+  top: 8px;
+  right: 0;
 }
 
-.panel-block {
-  display: block;
-  background: #fff;
+.navbar-todo {
+  background: #fff !important;
 }
 
-.pagination {
-  margin-bottom: 10px;
-}
-
-.checked {
-  font-style: italic;
-  text-decoration: line-through;
-}
-
-.icon-burger:before {
-  content: "≡";
-  float: right;
-}
-
-.level__checked {
-  cursor: pointer;
+.pagination-active{
+  color: #0f6ecd !important;
 }

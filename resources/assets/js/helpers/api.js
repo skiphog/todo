@@ -22,12 +22,21 @@ export function get (url) {
   });
 }
 
-export function del(url) {
+export function del (url) {
   return axios({
     method: 'DELETE',
     url: url,
     headers: {
       'Authorization': `Bearer ${Auth.state.api_token}`
     }
-  })
+  });
+}
+
+export function interceptors (cb) {
+  axios.interceptors.response.use((res) => {
+    return res;
+  }, (err) => {
+    cb(err);
+    return Promise.reject(err);
+  });
 }

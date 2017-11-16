@@ -1,69 +1,99 @@
 <template>
 
-    <div class="container">
+    <div>
 
-        <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+        <div class="uk-container uk-margin-bottom">
+            <ul class="uk-pagination uk-flex-center" uk-margin>
 
-            <a class="pagination-previous" v-if="hasPrev()" @click="changePage(prevPage)">Назад</a>
-            <a class="pagination-previous" v-if="!hasPrev()" disabled>Назад</a>
+                <li v-if="hasPrev()">
+                    <a @click.prevent="changePage(prevPage)">
+                        <span uk-pagination-previous></span>
+                    </a>
+                </li>
 
-            <a class="pagination-next" v-if="hasNext()" @click="changePage(nexPage)">Вперед</a>
-            <a class="pagination-next" v-if="!hasNext()" disabled>Вперед</a>
+                <li v-if="hasFirst()"><a @click.prevent="changePage(1)" href="#">1</a></li>
 
-            <ul class="pagination-list">
+                <li v-if="hasFirst()" class="uk-disabled"><span>...</span></li>
 
-                <li><a href="#" class="pagination-link" v-if="hasFirst()" @click.prevent="changePage(1)">1</a></li>
-                <li><span class="pagination-ellipsis" v-if="hasFirst()">&hellip;</span></li>
 
                 <li v-for="page in pages">
-                    <a href="#" @click.prevent="changePage(page)" class="pagination-link" :class="{'is-current': currentPage === page }">
+                    <a href="#" @click.prevent="changePage(page)" :class="{'pagination-active': currentPage === page }">
                         {{ page }}
                     </a>
                 </li>
 
-                <li><span class="pagination-ellipsis" v-if="hasLast()">&hellip;</span></li>
-                <li>
-                    <a href="#" class="pagination-link" v-if="hasLast()" @click.prevent="changePage(total)">{{ total }}</a>
+                <li v-if="hasLast()" class="uk-disabled"><span>...</span></li>
+
+                <li v-if="hasLast()"><a @click.prevent="changePage(total)" href="#">{{ total }}</a></li>
+
+
+                <li v-if="hasNext()">
+                    <a @click.prevent="changePage(nexPage)">
+                        <span uk-pagination-next></span>
+                    </a>
                 </li>
 
             </ul>
-        </nav>
+        </div>
 
-        <div class="columns">
-            <div class="column panel" v-for="(item, j) in lists">
-                <p class="panel-heading">
-                    <span :class="{'checked' : item.checked}">{{ item.title }}</span>
-                    <router-link class="icon-burger" :to="`/dashboard/${item.id}/edit`"></router-link>
-                </p>
+        <div class="uk-container uk-margin-bottom">
 
-                <div class="panel-block" v-for="(note, i ) in item.notes">
+            <div class="uk-child-width-1-2@s uk-child-width-1-3@m" uk-grid>
+                <div v-for="(item, j) in lists">
 
-                    <div class="level">
-                        <div class="level-left">
-                            <span class="level__checked" :class="{'checked' : note.checked}" @click="changeChecked(note,item)">{{ note.content }}</span>
-                        </div>
-                        <div class="level-right">
-                            <button class="delete" @click="deleteNote(j, i)"></button>
+
+                    <div class="uk-card uk-card-default uk-card-small uk-card-body uk-card-hover">
+                        <router-link class="uk-card-badge" :to="`/dashboard/${item.id}/edit`">
+                            <span uk-icon="icon: cog"></span></router-link>
+                        <h3 :class="{'checked' : item.checked}" class="uk-card-title">{{ item.title }}</h3>
+                        <hr>
+                        <ul class="uk-list uk-list-divider">
+                            <li v-for="(note, i ) in item.notes">
+                                <span class="checked-box" :class="{'checked' : note.checked}" @click="changeChecked(note,item)">{{ note.content }}</span>
+                                <button class="list-close" type="button" uk-close @click="deleteNote(j, i)"></button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="uk-divider-icon">
+
+        <div class="uk-section">
+            <div class="uk-container uk-margin-bottom">
+                <div class="uk-flex uk-flex-center">
+                    <div class="uk-card uk-card-default uk-card-body" title="Всего списков" uk-tooltip>
+                        <span uk-icon="icon: database"></span> {{ info.count}}
+                    </div>
+                    <div class="uk-card uk-card-default uk-card-body uk-margin-left" title="Выполнено" uk-tooltip>
+                        <span uk-icon="icon: check"></span> {{info.complete}}
+                    </div>
+                    <div class="uk-card uk-card-default uk-card-body uk-margin-left" title="Не выполнено" uk-tooltip>
+                        <span uk-icon="icon: bolt"></span> {{info.incomplete }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="uk-container uk-margin-bottom">
+                <div class="uk-child-width-expand@s uk-text-center" uk-grid>
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-body" title="Дата создания первого списка" uk-tooltip>
+                            <span uk-icon="icon: info"></span> {{info.date_start}}
                         </div>
                     </div>
 
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-body" title="Дата создания последнего списка" uk-tooltip>
+                            <span uk-icon="icon: info"></span> {{info.date_end}}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
 
-        <div class="info">
-            <div>
-                Всего списков {{ info.count}}
-                <br>
-                Выполненные списки {{info.complete}}
-                <br>
-                Невыполненные списки {{info.incomplete }}
-                <br>
-                Дата первого списка: {{info.date_start}}
-                <br>
-                Дата последнего: {{info.date_end}}
-            </div>
         </div>
 
     </div>
@@ -72,7 +102,7 @@
 
 <script>
   import { get, post, del } from '../helpers/api';
-
+  import Auth from '../helpers/auth';
   export default {
     data () {
       return {
@@ -87,7 +117,8 @@
         total: 0,
         perPage: 5,
         currentPage: 1,
-        pageRange: 2
+        pageRange: 2,
+        auth: Auth.state
       };
     },
     computed: {

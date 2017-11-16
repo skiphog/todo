@@ -1,6 +1,6 @@
 <template>
     <div class="form">
-        <h1 class="subtitle">{{ action }} лист</h1>
+        <h1 class="form__title">{{ action }} лист</h1>
 
         <div class="form__group">
             <label>Заголовок списка</label>
@@ -15,7 +15,7 @@
                 <input type="text" class="form__control" v-model="note.content"
                         :class="[error[`notes.${i}.content`] ? 'error__bg' : '']">
 
-                <button @click="remove(i)" class="delete"></button>
+                <button @click="remove(i)" type="button" class="delete" uk-close></button>
 
             </div>
         </div>
@@ -38,7 +38,7 @@
 
 <script>
   import Vue from 'vue';
-  import Flash from '../helpers/flash';
+  import UIkit from 'uikit';
   import { get, post, del } from '../helpers/api';
 
   export default {
@@ -71,7 +71,7 @@
 
         post(this.storeUrl, form).then((res) => {
           if (res.data.saved) {
-            Flash.setSuccess(res.data.message);
+            UIkit.notification('Сохранено', {status: 'success'});
             this.$router.push(`/dashboard`);
           }
           this.isProcessing = false;
@@ -92,7 +92,7 @@
       removePanel () {
         del(`/api/dashboard/${this.$route.params.id}`).then((res) => {
           if (res.data.deleted) {
-            Flash.setSuccess('Удалено');
+            UIkit.notification('Удалено', {status: 'success'});
             this.$router.push('/dashboard');
           }
         });

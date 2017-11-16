@@ -1,4 +1,5 @@
 <template>
+
     <form class="form" @submit.prevent="log_in">
         <h1 class="form__title">Войти</h1>
 
@@ -21,11 +22,12 @@
         </div>
 
     </form>
+
 </template>
 
 <script>
-  import Flash from '../../helpers/flash';
   import Auth from '../../helpers/auth';
+  import UIkit from 'uikit';
   import { post } from '../../helpers/api';
 
   export default {
@@ -42,11 +44,11 @@
     methods: {
       log_in () {
         this.isProcessing = true;
-        this.error = {};
+        //this.error = {};
         post(`/api/login`, this.form).then((res) => {
           if (res.data.authenticated) {
             Auth.set(res.data.api_token, res.data.user_id);
-            Flash.setSuccess('Вы успешно вошли');
+            UIkit.notification("Вы успешно вошли", {status: 'success'});
             this.$router.push('/dashboard');
           }
           this.isProcessing = false;

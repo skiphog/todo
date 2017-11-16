@@ -29,8 +29,8 @@
 </template>
 
 <script>
-  import Flash from '../../helpers/flash';
   import { post } from '../../helpers/api';
+  import UIkit from 'uikit';
 
   export default {
     data () {
@@ -47,10 +47,10 @@
     methods: {
       register () {
         this.isProcessing = true;
-        this.error = {};
+        //this.error = {};
         post(`/api/register`, this.form).then((res) => {
           if (res.data.registered) {
-            Flash.setSuccess('Аккаунт успешно создан');
+            UIkit.notification('Аккаунт успешно создан', {status: 'success'});
             this.$router.push('/login');
           }
           this.isProcessing = false;
