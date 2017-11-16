@@ -49,8 +49,14 @@
                         <hr>
                         <ul class="uk-list uk-list-divider">
                             <li v-for="(note, i ) in item.notes">
-                                <span class="checked-box" :class="{'checked' : note.checked}" @click="changeChecked(note,item)">{{ note.content }}</span>
-                                <button class="list-close" type="button" uk-close @click="deleteNote(j, i)"></button>
+                                <div class="uk-clearfix">
+                                    <div class="uk-float-left">
+                                        <span class="checked-box" :class="{'checked' : note.checked}" @click="changeChecked(note,item)">{{ note.content }}</span>
+                                    </div>
+                                    <div class="uk-float-right">
+                                        <button  type="button" uk-close @click="deleteNote(j, i)"></button>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -68,10 +74,10 @@
                     <div class="uk-card uk-card-default uk-card-body" title="Всего списков" uk-tooltip>
                         <span uk-icon="icon: database"></span> {{ info.count}}
                     </div>
-                    <div class="uk-card uk-card-default uk-card-body uk-margin-left" title="Выполнено" uk-tooltip>
+                    <div class="uk-card uk-card-default uk-card-body uk-margin-left uk-text-success" title="Выполнено" uk-tooltip>
                         <span uk-icon="icon: check"></span> {{info.complete}}
                     </div>
-                    <div class="uk-card uk-card-default uk-card-body uk-margin-left" title="Не выполнено" uk-tooltip>
+                    <div class="uk-card uk-card-default uk-card-body uk-margin-left uk-text-danger" title="Не выполнено" uk-tooltip>
                         <span uk-icon="icon: bolt"></span> {{info.incomplete }}
                     </div>
                 </div>
